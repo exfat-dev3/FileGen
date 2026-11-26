@@ -1,0 +1,1972 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileGen - AI アシスタント</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Noto Sans JP -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Material Design 3 (Material You) カラートークン定義 */
+        :root, [data-theme="indigo"][data-mode="light"] {
+            --md-primary: #4f46e5;
+            --md-on-primary: #ffffff;
+            --md-primary-container: #e0e7ff;
+            --md-on-primary-container: #1e1b4b;
+            --md-secondary-container: #e2e8f0;
+            --md-on-secondary-container: #1e293b;
+            --md-surface: #f8fafc;
+            --md-surface-container-low: #f1f5f9;
+            --md-surface-container: #e2e8f0;
+            --md-surface-container-high: #ffffff;
+            --md-on-surface: #0f172a;
+            --md-on-surface-variant: #475569;
+            --md-outline: #94a3b8;
+            --md-outline-variant: #cbd5e1;
+        }
+        [data-theme="indigo"][data-mode="dark"] {
+            --md-primary: #a5b4fc;
+            --md-on-primary: #1e1b4b;
+            --md-primary-container: #312e81;
+            --md-on-primary-container: #e0e7ff;
+            --md-secondary-container: #334155;
+            --md-on-secondary-container: #f1f5f9;
+            --md-surface: #0f172a;
+            --md-surface-container-low: #1e293b;
+            --md-surface-container: #283548;
+            --md-surface-container-high: #1e293b;
+            --md-on-surface: #f8fafc;
+            --md-on-surface-variant: #94a3b8;
+            --md-outline: #64748b;
+            --md-outline-variant: #334155;
+        }
+
+        /* Emerald (フォレストグリーン) */
+        [data-theme="emerald"][data-mode="light"] {
+            --md-primary: #059669;
+            --md-on-primary: #ffffff;
+            --md-primary-container: #d1fae5;
+            --md-on-primary-container: #064e3b;
+            --md-secondary-container: #e2ece9;
+            --md-on-secondary-container: #14362d;
+            --md-surface: #f6fbf9;
+            --md-surface-container-low: #ecf4f1;
+            --md-surface-container: #dfece7;
+            --md-surface-container-high: #ffffff;
+            --md-on-surface: #0c1f1a;
+            --md-on-surface-variant: #3f5750;
+            --md-outline: #738f86;
+            --md-outline-variant: #c4d7d0;
+        }
+        [data-theme="emerald"][data-mode="dark"] {
+            --md-primary: #6ee7b7;
+            --md-on-primary: #064e3b;
+            --md-primary-container: #065f46;
+            --md-on-primary-container: #d1fae5;
+            --md-secondary-container: #1f3b33;
+            --md-on-secondary-container: #d8ece6;
+            --md-surface: #0b1915;
+            --md-surface-container-low: #132620;
+            --md-surface-container: #1b332b;
+            --md-surface-container-high: #152b24;
+            --md-on-surface: #eef7f4;
+            --md-on-surface-variant: #9bb5ad;
+            --md-outline: #5c7870;
+            --md-outline-variant: #264239;
+        }
+
+        /* Rose (サクラピンク) */
+        [data-theme="rose"][data-mode="light"] {
+            --md-primary: #e11d48;
+            --md-on-primary: #ffffff;
+            --md-primary-container: #ffe4e6;
+            --md-on-primary-container: #881337;
+            --md-secondary-container: #f5e6e8;
+            --md-on-secondary-container: #3d1d24;
+            --md-surface: #fffafb;
+            --md-surface-container-low: #fbf0f2;
+            --md-surface-container: #f4e2e5;
+            --md-surface-container-high: #ffffff;
+            --md-on-surface: #240c12;
+            --md-on-surface-variant: #5e3f46;
+            --md-outline: #96727a;
+            --md-outline-variant: #dec4ca;
+        }
+        [data-theme="rose"][data-mode="dark"] {
+            --md-primary: #fda4af;
+            --md-on-primary: #881337;
+            --md-primary-container: #9f1239;
+            --md-on-primary-container: #ffe4e6;
+            --md-secondary-container: #45232b;
+            --md-on-secondary-container: #f7dce0;
+            --md-surface: #1c0d11;
+            --md-surface-container-low: #29151a;
+            --md-surface-container: #361d23;
+            --md-surface-container-high: #2e171d;
+            --md-on-surface: #fcf0f2;
+            --md-on-surface-variant: #c49fa6;
+            --md-outline: #825d65;
+            --md-outline-variant: #4a2830;
+        }
+
+        /* Amber (サンセットオレンジ) */
+        [data-theme="amber"][data-mode="light"] {
+            --md-primary: #d97706;
+            --md-on-primary: #ffffff;
+            --md-primary-container: #fef3c7;
+            --md-on-primary-container: #78350f;
+            --md-secondary-container: #f3ece1;
+            --md-on-secondary-container: #382c1e;
+            --md-surface: #fffdf9;
+            --md-surface-container-low: #faf4eb;
+            --md-surface-container: #f2e8da;
+            --md-surface-container-high: #ffffff;
+            --md-on-surface: #21180d;
+            --md-on-surface-variant: #594b3b;
+            --md-outline: #8f7e6a;
+            --md-outline-variant: #dbd0c0;
+        }
+        [data-theme="amber"][data-mode="dark"] {
+            --md-primary: #fcd34d;
+            --md-on-primary: #78350f;
+            --md-primary-container: #92400e;
+            --md-on-primary-container: #fef3c7;
+            --md-secondary-container: #3d3122;
+            --md-on-secondary-container: #f2e6d8;
+            --md-surface: #19130c;
+            --md-surface-container-low: #241c13;
+            --md-surface-container: #30261a;
+            --md-surface-container-high: #292016;
+            --md-on-surface: #faf4ed;
+            --md-on-surface-variant: #bfb09f;
+            --md-outline: #7d6e5d;
+            --md-outline-variant: #423627;
+        }
+
+        /* Cyan (オーシャンブルー) */
+        [data-theme="cyan"][data-mode="light"] {
+            --md-primary: #0284c7;
+            --md-on-primary: #ffffff;
+            --md-primary-container: #e0f2fe;
+            --md-on-primary-container: #0c4a6e;
+            --md-secondary-container: #e2edf3;
+            --md-on-secondary-container: #172e3b;
+            --md-surface: #f7fbfe;
+            --md-surface-container-low: #edf5fa;
+            --md-surface-container: #e0ecf3;
+            --md-surface-container-high: #ffffff;
+            --md-on-surface: #0b1c26;
+            --md-on-surface-variant: #3e5461;
+            --md-outline: #708a99;
+            --md-outline-variant: #c2d4df;
+        }
+        [data-theme="cyan"][data-mode="dark"] {
+            --md-primary: #7dd3fc;
+            --md-on-primary: #0c4a6e;
+            --md-primary-container: #075985;
+            --md-on-primary-container: #e0f2fe;
+            --md-secondary-container: #1c3442;
+            --md-on-secondary-container: #d9ebf5;
+            --md-surface: #0a161d;
+            --md-surface-container-low: #12232d;
+            --md-surface-container: #1a303d;
+            --md-surface-container-high: #152833;
+            --md-on-surface: #eef6fb;
+            --md-on-surface-variant: #9ab3c2;
+            --md-outline: #5b7585;
+            --md-outline-variant: #243d4c;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: var(--md-surface);
+            color: var(--md-on-surface);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        code, pre {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Material You ユーティリティクラス */
+        .md-surface { background-color: var(--md-surface); color: var(--md-on-surface); }
+        .md-surface-low { background-color: var(--md-surface-container-low); }
+        .md-surface-container { background-color: var(--md-surface-container); }
+        .md-surface-high { background-color: var(--md-surface-container-high); }
+        .md-primary { background-color: var(--md-primary); color: var(--md-on-primary); }
+        .md-primary-container { background-color: var(--md-primary-container); color: var(--md-on-primary-container); }
+        .md-secondary-container { background-color: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+        .md-text-primary { color: var(--md-primary); }
+        .md-text-variant { color: var(--md-on-surface-variant); }
+        .md-border-variant { border-color: var(--md-outline-variant); }
+
+        /* カスタムスクロールバー */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--md-outline-variant);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--md-outline);
+        }
+
+        /* Markdown スタイリング（Material You 対応） */
+        .markdown-body p {
+            margin-bottom: 0.75rem;
+            line-height: 1.7;
+        }
+        .markdown-body p:last-child {
+            margin-bottom: 0;
+        }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+            font-weight: 700;
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--md-on-surface);
+        }
+        .markdown-body h1 { font-size: 1.25rem; }
+        .markdown-body h2 { font-size: 1.125rem; }
+        .markdown-body h3 { font-size: 1rem; }
+        .markdown-body ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .markdown-body ol {
+            list-style-type: decimal;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .markdown-body li {
+            margin-bottom: 0.25rem;
+        }
+        .markdown-body pre {
+            background-color: #161b22;
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 1.25rem;
+            overflow-x: auto;
+            margin: 0.75rem 0;
+            position: relative;
+        }
+        .markdown-body code:not(pre code) {
+            background-color: var(--md-secondary-container);
+            color: var(--md-on-secondary-container);
+            padding: 0.15rem 0.45rem;
+            border-radius: 0.5rem;
+            font-size: 0.875em;
+        }
+        .markdown-body blockquote {
+            border-left: 4px solid var(--md-primary);
+            padding-left: 1rem;
+            color: var(--md-on-surface-variant);
+            font-style: italic;
+            margin: 0.75rem 0;
+        }
+        .markdown-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.75rem 0;
+            font-size: 0.875rem;
+        }
+        .markdown-body th, .markdown-body td {
+            border: 1px solid var(--md-outline-variant);
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+        }
+        .markdown-body th {
+            background-color: var(--md-surface-container);
+            font-weight: 600;
+        }
+
+        /* タイピングアニメーション */
+        .typing-dot {
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Material Design 3 リップルアニメーション（長押し維持対応） */
+        button, [role="button"], #previewPillHandle {
+            position: relative;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .md-ripple {
+            position: absolute;
+            border-radius: 9999px;
+            transform: translate(-50%, -50%) scale(0);
+            background-color: currentColor;
+            opacity: 0.22;
+            pointer-events: none;
+            transition: transform 0.55s cubic-bezier(0.2, 0, 0, 1), opacity 0.45s ease-out;
+            z-index: 1;
+        }
+        .md-ripple.is-expanded {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 0.22;
+        }
+        .md-ripple.is-releasing {
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden">
+
+    <!-- モバイル用オーバーレイ -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/40 z-20 hidden md:hidden transition-opacity" onclick="toggleSidebar()"></div>
+
+    <!-- Material Design 3 Navigation Drawer（サイドバー） -->
+    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-30 w-80 md-surface-low border-r md-border-variant flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+        <!-- ブランドヘッダー -->
+        <div class="p-5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl md-primary-container flex items-center justify-center shadow-xs">
+                    <i data-lucide="file-code-2" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold tracking-tight text-lg leading-none">FileGen</h1>
+                    <span class="text-[11px] md-text-variant font-medium">Material You Assistant</span>
+                </div>
+            </div>
+            <button onclick="toggleSidebar()" class="md:hidden p-2 md-text-variant hover:opacity-80 rounded-full">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- M3 Extended FAB（新規チャットボタン） -->
+        <div class="px-4 pb-3">
+            <button onclick="createNewSession()" class="w-full py-3.5 px-5 md-primary-container hover:brightness-95 active:scale-[0.99] rounded-2xl font-semibold text-sm flex items-center gap-3 transition-all shadow-xs">
+                <i data-lucide="plus" class="w-5 h-5"></i>
+                <span>新しいチャット</span>
+            </button>
+        </div>
+
+        <!-- 履歴リストラベル -->
+        <div class="px-5 pt-3 pb-2 flex items-center justify-between">
+            <span class="text-xs font-semibold tracking-wider md-text-variant">最近の会話</span>
+            <span id="sessionCount" class="text-xs font-medium md-secondary-container px-2.5 py-0.5 rounded-full">0</span>
+        </div>
+
+        <!-- 会話履歴一覧コンテナ -->
+        <div id="sessionList" class="flex-1 overflow-y-auto px-3 py-1 space-y-1">
+            <!-- JSで動的に描画 -->
+        </div>
+
+        <!-- フッター情報（クラウド同期ステータス＆エクスポート） -->
+        <div class="p-4 border-t md-border-variant">
+            <div class="flex items-center justify-between text-xs px-3.5 py-2.5 rounded-full md-surface-container">
+                <div class="flex items-center gap-2">
+                    <span id="syncIndicator" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    <span id="syncStatusText" class="font-medium">接続中...</span>
+                </div>
+                <button onclick="exportCurrentChat()" title="現在の会話をMarkdownで保存" class="md-text-variant hover:opacity-80 transition-opacity p-1 rounded-full">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- メインコンテンツ領域 -->
+    <main class="flex-1 flex flex-col h-full min-w-0 md-surface relative">
+        <!-- M3 Top App Bar -->
+        <header class="h-16 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-10 md-surface">
+            <div class="flex items-center gap-3 min-w-0">
+                <button onclick="toggleSidebar()" class="md:hidden p-2.5 -ml-2 md-text-variant hover:opacity-80 rounded-full transition-colors">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+                <div class="flex items-center gap-2 min-w-0">
+                    <h2 id="currentChatTitle" class="font-semibold truncate text-base sm:text-lg">新しいチャット</h2>
+                    <button onclick="openRenameModal()" title="タイトルを編集" class="md-text-variant hover:opacity-80 p-1.5 rounded-full transition-colors flex-shrink-0">
+                        <i data-lucide="pencil" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 sm:gap-2">
+                <span class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold md-secondary-container px-3 py-1.5 rounded-full">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5 md-text-primary"></i>
+                    Gemini 3 Flash
+                </span>
+                <!-- ツールボタン＆ドロップダウン -->
+                <div class="relative" id="toolsMenuWrapper">
+                    <button onclick="toggleToolsMenu(event)" title="ツール" class="p-2.5 md-text-variant hover:opacity-80 rounded-full transition-colors">
+                        <i data-lucide="wrench" class="w-5 h-5"></i>
+                    </button>
+                    <div id="toolsDropdown" class="hidden absolute right-0 mt-2 w-60 md-surface-high border md-border-variant rounded-3xl shadow-xl p-2 z-40">
+                        <div class="px-3 py-1.5 text-[11px] font-semibold md-text-variant">ツール一覧</div>
+                        <button onclick="openHtmlPreviewWindow()" class="w-full text-left px-3.5 py-2.5 rounded-2xl hover:opacity-90 md-secondary-container flex items-center gap-3 text-sm font-semibold transition-all">
+                            <span class="w-8 h-8 rounded-full md-primary-container flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="layout-template" class="w-4 h-4"></i>
+                            </span>
+                            <div>
+                                <div>HTMLプレビューツール</div>
+                                <div class="text-[11px] font-normal md-text-variant">ウィンドウでHTMLを即時描画</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                <button onclick="openThemeModal()" title="テーマ設定" class="p-2.5 md-text-variant hover:opacity-80 rounded-full transition-colors">
+                    <i data-lucide="palette" class="w-5 h-5"></i>
+                </button>
+                <button onclick="openSettingsModal()" title="設定（追加プロンプト）" class="p-2.5 md-text-variant hover:opacity-80 rounded-full transition-colors">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                </button>
+                <button onclick="openDeleteModal()" title="この会話を削除" class="p-2.5 md-text-variant hover:text-red-500 rounded-full transition-colors">
+                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- チャットメッセージ表示エリア -->
+        <div id="chatContainer" class="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-6 scroll-smooth">
+            <!-- ウェルカム画面（メッセージが空の時に表示） -->
+            <div id="welcomeScreen" class="max-w-2xl mx-auto my-auto pt-6 sm:pt-12 text-center space-y-6">
+                <div class="w-20 h-20 mx-auto rounded-[28px] md-primary-container flex items-center justify-center shadow-sm">
+                    <i data-lucide="sparkles" class="w-10 h-10"></i>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="text-2xl sm:text-3xl font-bold tracking-tight">こんにちは、FileGenです</h3>
+                    <p class="md-text-variant text-sm sm:text-base max-w-md mx-auto">
+                        ドキュメント作成やFilegenAPIによる単一ファイル生成をお手伝いします。右上のパレットからテーマカラーも変更できます。
+                    </p>
+                </div>
+
+                <!-- クイックプロンプト提案（M3 Filled Cards） -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-left pt-4">
+                    <button onclick="usePrompt('企画書のテンプレートをMarkdown形式で作成して')" class="p-5 rounded-3xl md-surface-low hover:brightness-95 transition-all group">
+                        <div class="flex items-center gap-2.5 font-semibold text-sm mb-1.5">
+                            <span class="w-8 h-8 rounded-full md-primary-container flex items-center justify-center">
+                                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                            </span>
+                            <span>企画書テンプレート作成</span>
+                        </div>
+                        <p class="text-xs md-text-variant leading-relaxed">新規プロジェクト用の構造化されたMarkdown企画書を生成します。</p>
+                    </button>
+
+                    <button onclick="usePrompt('PythonでCSVファイルを読み込んで集計するスクリプトをFilegenAPIで生成して')" class="p-5 rounded-3xl md-surface-low hover:brightness-95 transition-all group">
+                        <div class="flex items-center gap-2.5 font-semibold text-sm mb-1.5">
+                            <span class="w-8 h-8 rounded-full md-primary-container flex items-center justify-center">
+                                <i data-lucide="code" class="w-4 h-4"></i>
+                            </span>
+                            <span>Pythonスクリプト生成</span>
+                        </div>
+                        <p class="text-xs md-text-variant leading-relaxed">FilegenAPIを使い単一ファイルとしてダウンロード可能なコードを作成します。</p>
+                    </button>
+
+                    <button onclick="usePrompt('効果的な議事録の書き方とフォーマットを教えて')" class="p-5 rounded-3xl md-surface-low hover:brightness-95 transition-all group">
+                        <div class="flex items-center gap-2.5 font-semibold text-sm mb-1.5">
+                            <span class="w-8 h-8 rounded-full md-primary-container flex items-center justify-center">
+                                <i data-lucide="list-checks" class="w-4 h-4"></i>
+                            </span>
+                            <span>議事録フォーマット</span>
+                        </div>
+                        <p class="text-xs md-text-variant leading-relaxed">決定事項とネクストアクションが明確になる構成を提案します。</p>
+                    </button>
+
+                    <button onclick="usePrompt('ビジネスメールの丁寧な断り方の例文を3パターン作って')" class="p-5 rounded-3xl md-surface-low hover:brightness-95 transition-all group">
+                        <div class="flex items-center gap-2.5 font-semibold text-sm mb-1.5">
+                            <span class="w-8 h-8 rounded-full md-primary-container flex items-center justify-center">
+                                <i data-lucide="mail" class="w-4 h-4"></i>
+                            </span>
+                            <span>ビジネス文書作成</span>
+                        </div>
+                        <p class="text-xs md-text-variant leading-relaxed">状況に応じた適切なトーンのメール文面を作成します。</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- メッセージリスト -->
+            <div id="messagesList" class="max-w-3xl mx-auto space-y-6 hidden"></div>
+        </div>
+
+        <!-- 入力エリア（M3 Pill-shaped Input Bar） -->
+        <div class="px-4 sm:px-6 pb-4 pt-2 md-surface">
+            <div class="max-w-3xl mx-auto">
+                <form id="chatForm" onsubmit="handleSendMessage(event)" class="relative flex items-end gap-2 md-surface-low border md-border-variant rounded-[28px] p-2 pl-4 transition-all shadow-xs">
+                    <textarea
+                        id="messageInput"
+                        rows="1"
+                        placeholder="FileGenにメッセージを送る..."
+                        class="w-full bg-transparent border-0 focus:ring-0 resize-none py-2.5 text-sm sm:text-base max-h-40 overflow-y-auto outline-none"
+                        oninput="autoResizeTextarea(this)"
+                        onkeydown="handleKeyDown(event)"
+                    ></textarea>
+                    <button
+                        type="submit"
+                        id="sendBtn"
+                        class="p-3 rounded-full md-primary hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0"
+                    >
+                        <i data-lucide="arrow-up" class="w-5 h-5"></i>
+                    </button>
+                </form>
+                <div class="text-center mt-2">
+                    <p class="text-[11px] md-text-variant">FileGenはAIによって回答を生成します。会話履歴は自動保存されます。</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- M3 Dialog：タイトル編集 -->
+    <div id="renameModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+        <div class="md-surface-high rounded-[28px] max-w-md w-full p-6 shadow-2xl space-y-5">
+            <h3 class="text-xl font-bold">チャットタイトルの編集</h3>
+            <input type="text" id="renameInput" class="w-full px-4 py-3 md-surface-low border md-border-variant rounded-2xl focus:outline-none text-sm" placeholder="新しいタイトルを入力">
+            <div class="flex justify-end gap-2 pt-1">
+                <button onclick="closeRenameModal()" class="px-5 py-2.5 text-sm font-semibold md-text-primary hover:opacity-80 rounded-full transition-colors">キャンセル</button>
+                <button onclick="confirmRename()" class="px-5 py-2.5 text-sm font-semibold md-primary hover:brightness-110 rounded-full transition-all">保存する</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- M3 Dialog：削除確認 -->
+    <div id="deleteModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+        <div class="md-surface-high rounded-[28px] max-w-sm w-full p-6 shadow-2xl space-y-5">
+            <div class="w-12 h-12 rounded-full bg-red-500/15 text-red-500 flex items-center justify-center">
+                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold">会話を削除しますか？</h3>
+                <p class="text-sm md-text-variant mt-1.5">この操作は取り消せません。履歴から完全に削除されます。</p>
+            </div>
+            <div class="flex justify-end gap-2 pt-1">
+                <button onclick="closeDeleteModal()" class="px-5 py-2.5 text-sm font-semibold md-text-primary hover:opacity-80 rounded-full transition-colors">キャンセル</button>
+                <button onclick="confirmDelete()" class="px-5 py-2.5 text-sm font-semibold bg-red-600 hover:bg-red-500 text-white rounded-full transition-colors">削除する</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- M3 Dialog：テーマ設定（Material You テーマ設定） -->
+    <div id="themeModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+        <div class="md-surface-high rounded-[28px] max-w-md w-full p-6 shadow-2xl space-y-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl md-primary-container flex items-center justify-center">
+                        <i data-lucide="palette" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold">テーマ設定</h3>
+                        <p class="text-xs md-text-variant">Material You テーマをCookieに保存</p>
+                    </div>
+                </div>
+                <button onclick="closeThemeModal()" class="md-text-variant hover:opacity-80 p-2 rounded-full">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Material You テーマ設定セクション -->
+            <div class="space-y-4 p-4 rounded-3xl md-surface-low">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-semibold">外観モード</span>
+                    <!-- M3 Segmented Button -->
+                    <div class="inline-flex rounded-full border md-border-variant p-1 md-surface">
+                        <button type="button" id="modeLightBtn" onclick="selectThemeMode('light')" class="px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all">
+                            <i data-lucide="sun" class="w-3.5 h-3.5"></i>
+                            <span>ライト</span>
+                        </button>
+                        <button type="button" id="modeDarkBtn" onclick="selectThemeMode('dark')" class="px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all">
+                            <i data-lucide="moon" class="w-3.5 h-3.5"></i>
+                            <span>ダーク</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <span class="block text-sm font-semibold">ダイナミックカラー（テーマ色）</span>
+                    <div class="grid grid-cols-5 gap-2.5 pt-1">
+                        <button type="button" onclick="selectThemeColor('indigo')" data-color-btn="indigo" class="theme-swatch flex flex-col items-center gap-1.5 p-2 rounded-2xl border-2 border-transparent transition-all">
+                            <span class="w-9 h-9 rounded-full bg-[#4f46e5] flex items-center justify-center text-white shadow-xs">
+                                <i data-lucide="check" class="w-4 h-4 hidden swatch-check"></i>
+                            </span>
+                            <span class="text-[11px] font-medium">インディゴ</span>
+                        </button>
+                        <button type="button" onclick="selectThemeColor('emerald')" data-color-btn="emerald" class="theme-swatch flex flex-col items-center gap-1.5 p-2 rounded-2xl border-2 border-transparent transition-all">
+                            <span class="w-9 h-9 rounded-full bg-[#059669] flex items-center justify-center text-white shadow-xs">
+                                <i data-lucide="check" class="w-4 h-4 hidden swatch-check"></i>
+                            </span>
+                            <span class="text-[11px] font-medium">フォレスト</span>
+                        </button>
+                        <button type="button" onclick="selectThemeColor('rose')" data-color-btn="rose" class="theme-swatch flex flex-col items-center gap-1.5 p-2 rounded-2xl border-2 border-transparent transition-all">
+                            <span class="w-9 h-9 rounded-full bg-[#e11d48] flex items-center justify-center text-white shadow-xs">
+                                <i data-lucide="check" class="w-4 h-4 hidden swatch-check"></i>
+                            </span>
+                            <span class="text-[11px] font-medium">サクラ</span>
+                        </button>
+                        <button type="button" onclick="selectThemeColor('amber')" data-color-btn="amber" class="theme-swatch flex flex-col items-center gap-1.5 p-2 rounded-2xl border-2 border-transparent transition-all">
+                            <span class="w-9 h-9 rounded-full bg-[#d97706] flex items-center justify-center text-white shadow-xs">
+                                <i data-lucide="check" class="w-4 h-4 hidden swatch-check"></i>
+                            </span>
+                            <span class="text-[11px] font-medium">サンセット</span>
+                        </button>
+                        <button type="button" onclick="selectThemeColor('cyan')" data-color-btn="cyan" class="theme-swatch flex flex-col items-center gap-1.5 p-2 rounded-2xl border-2 border-transparent transition-all">
+                            <span class="w-9 h-9 rounded-full bg-[#0284c7] flex items-center justify-center text-white shadow-xs">
+                                <i data-lucide="check" class="w-4 h-4 hidden swatch-check"></i>
+                            </span>
+                            <span class="text-[11px] font-medium">オーシャン</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-1">
+                <button onclick="closeThemeModal()" class="px-5 py-2.5 text-sm font-semibold md-text-primary hover:opacity-80 rounded-full transition-colors">閉じる</button>
+                <button onclick="saveThemeSettings()" class="px-5 py-2.5 text-sm font-semibold md-primary hover:brightness-110 rounded-full transition-all">Cookieに保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- M3 Dialog：設定（追加プロンプト設定） -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+        <div class="md-surface-high rounded-[28px] max-w-lg w-full p-6 shadow-2xl space-y-5">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl md-primary-container flex items-center justify-center">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold">設定（追加プロンプト）</h3>
+                        <p class="text-xs md-text-variant">システムプロンプトの末尾に結合してCookieに保存します</p>
+                    </div>
+                </div>
+                <button onclick="closeSettingsModal()" class="md-text-variant hover:opacity-80 p-2 rounded-full">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-2">
+                <label for="customPromptInput" class="block text-xs font-semibold md-text-variant">追加プロンプト</label>
+                <textarea id="customPromptInput" rows="5" class="w-full px-4 py-3 md-surface-low border md-border-variant rounded-2xl focus:outline-none text-sm leading-relaxed" placeholder="例：回答は常に箇条書きで簡潔にまとめてください。また、コードには詳細な日本語コメントを付けてください。"></textarea>
+            </div>
+
+            <div class="flex items-center justify-between pt-1">
+                <button onclick="clearCustomPrompt()" class="px-4 py-2 text-xs font-semibold text-red-500 hover:bg-red-500/10 rounded-full transition-colors">リセット</button>
+                <div class="flex gap-2">
+                    <button onclick="closeSettingsModal()" class="px-5 py-2.5 text-sm font-semibold md-text-primary hover:opacity-80 rounded-full transition-colors">閉じる</button>
+                    <button onclick="savePromptSettings()" class="px-5 py-2.5 text-sm font-semibold md-primary hover:brightness-110 rounded-full transition-all">Cookieに保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- フローティングウィンドウ：HTMLプレビューツール -->
+    <div id="htmlPreviewWindow" class="fixed hidden flex-col md-surface-high border md-border-variant rounded-[28px] shadow-2xl z-50 overflow-hidden" style="top: 80px; left: max(16px, calc(50% - 260px)); width: min(520px, calc(100vw - 32px)); height: min(480px, calc(100vh - 120px)); min-width: 280px; min-height: 200px;">
+        <!-- ウィンドウヘッダー（ピル型ハンドル ＆ タブ切替） -->
+        <div class="px-4 py-2.5 md-surface-low border-b md-border-variant flex items-center justify-between gap-2 select-none relative">
+            <div class="flex items-center gap-1.5 text-xs font-semibold md-text-variant">
+                <i data-lucide="layout-template" class="w-4 h-4 md-text-primary"></i>
+                <span class="hidden sm:inline">HTMLプレビュー</span>
+            </div>
+
+            <!-- 中央：ピル型ドラッグ＆オプションハンドル -->
+            <div class="relative flex flex-col items-center">
+                <button id="previewPillHandle" type="button" title="ドラッグで移動 / クリックでウィンドウオプション" class="px-5 py-1.5 rounded-full md-secondary-container hover:brightness-95 active:scale-95 transition-all cursor-grab active:cursor-grabbing flex items-center gap-1.5 shadow-2xs">
+                    <span class="w-8 h-1.5 rounded-full bg-current opacity-50"></span>
+                </button>
+
+                <!-- ウィンドウオプションメニュー（ハンドルクリックで展開） -->
+                <div id="windowOptionsMenu" class="hidden absolute top-9 left-1/2 -translate-x-1/2 w-52 md-surface-high border md-border-variant rounded-2xl shadow-xl p-1.5 z-50 space-y-1">
+                    <button type="button" onclick="toggleMaximizePreviewWindow()" class="w-full text-left px-3 py-2 rounded-xl hover:opacity-80 md-surface-low text-xs font-semibold flex items-center gap-2.5 transition-colors">
+                        <i data-lucide="maximize-2" class="w-3.5 h-3.5 md-text-primary"></i>
+                        <span>最大化 / 元に戻す</span>
+                    </button>
+                    <button type="button" onclick="toggleMinimizePreviewWindow()" class="w-full text-left px-3 py-2 rounded-xl hover:opacity-80 md-surface-low text-xs font-semibold flex items-center gap-2.5 transition-colors">
+                        <i data-lucide="minus" class="w-3.5 h-3.5 md-text-primary"></i>
+                        <span>最小化（折りたたみ）</span>
+                    </button>
+                    <button type="button" onclick="resetPreviewWindowPosition()" class="w-full text-left px-3 py-2 rounded-xl hover:opacity-80 md-surface-low text-xs font-semibold flex items-center gap-2.5 transition-colors">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 md-text-primary"></i>
+                        <span>位置とサイズをリセット</span>
+                    </button>
+                    <div class="border-t md-border-variant my-1"></div>
+                    <button type="button" onclick="closeHtmlPreviewWindow()" class="w-full text-left px-3 py-2 rounded-xl hover:bg-red-500/10 text-red-500 text-xs font-semibold flex items-center gap-2.5 transition-colors">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        <span>ウィンドウを閉じる</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 右側：表示モード切替ピル -->
+            <div class="inline-flex rounded-full border md-border-variant p-0.5 md-surface">
+                <button type="button" id="tabPreviewBtn" onclick="switchPreviewTab('preview')" class="px-2.5 py-1 rounded-full text-[11px] font-semibold md-primary transition-all">プレビュー</button>
+                <button type="button" id="tabCodeBtn" onclick="switchPreviewTab('code')" class="px-2.5 py-1 rounded-full text-[11px] font-semibold md-text-variant transition-all">HTML</button>
+            </div>
+        </div>
+
+        <!-- ウィンドウ本体 -->
+        <div id="previewWindowBody" class="flex-1 relative flex flex-col min-h-0 bg-white">
+            <iframe id="htmlPreviewFrame" class="w-full h-full border-0 flex-1 bg-white" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>
+            <div id="htmlCodeEditorArea" class="hidden flex-1 flex flex-col md-surface h-full">
+                <textarea id="htmlPreviewSource" oninput="updateHtmlPreviewFrame()" class="w-full flex-1 p-4 font-mono text-xs md-surface focus:outline-none resize-none leading-relaxed" placeholder="ここにHTMLコードを入力するとリアルタイムでプレビューされます..."></textarea>
+            </div>
+            <!-- 右下リサイズグリップ -->
+            <div id="previewResizeHandle" title="ドラッグしてサイズ変更" class="absolute bottom-1 right-1 w-6 h-6 rounded-full md-secondary-container/80 flex items-center justify-center cursor-nwse-resize opacity-70 hover:opacity-100 transition-opacity">
+                <i data-lucide="grip" class="w-3.5 h-3.5"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- M3 Snackbar（トースト通知） -->
+    <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 md-secondary-container text-xs font-semibold px-5 py-3 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-50 flex items-center gap-2 border md-border-variant">
+        <i data-lucide="check-circle-2" class="w-4 h-4 md-text-primary"></i>
+        <span id="toastMessage">通知メッセージ</span>
+    </div>
+
+    <!-- アプリケーションロジック (Firebase + Vercel Serverless API /api/chat) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // グローバル状態管理
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+        let sessions = []; // 全会話セッションの配列
+        let currentSessionId = null;
+        let isGenerating = false;
+        let currentThinkingStep = "";
+        let thinkingInterval = null;
+        let unsubscribeSessions = null;
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'filegen-assistant-default';
+        // Vercel Environment Variables（GEMINI_API_KEY）を参照するサーバーレスエンドポイント
+        const CHAT_API_ENDPOINT = "/api/chat";
+        let customPrompt = "";
+        let currentThemeColor = "indigo";
+        let currentThemeMode = "light";
+
+        // Cookie 操作ユーティリティ
+        function setCookie(name, value, days = 365) {
+            const expires = new Date(Date.now() + days * 864e5).toUTCString();
+            document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+        }
+
+        function getCookie(name) {
+            const cookies = document.cookie ? document.cookie.split('; ') : [];
+            for (let i = 0; i < cookies.length; i++) {
+                const parts = cookies[i].split('=');
+                const key = parts.shift();
+                if (key === name) {
+                    return decodeURIComponent(parts.join('='));
+                }
+            }
+            return '';
+        }
+
+        // Marked.js の設定（コードハイライト対応）
+        marked.setOptions({
+            highlight: function(code, lang) {
+                if (lang && hljs.getLanguage(lang)) {
+                    return hljs.highlight(code, { language: lang }).value;
+                }
+                return hljs.highlightAuto(code).value;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // 初期化処理
+        async function initApp() {
+            customPrompt = getCookie('filegen_custom_prompt');
+            const savedColor = getCookie('filegen_theme_color');
+            const savedMode = getCookie('filegen_theme_mode');
+            if (savedColor) currentThemeColor = savedColor;
+            if (savedMode) currentThemeMode = savedMode;
+            applyTheme(currentThemeColor, currentThemeMode);
+
+            lucide.createIcons();
+            
+            try {
+                if (typeof __firebase_config !== 'undefined') {
+                    const firebaseConfig = JSON.parse(__firebase_config);
+                    const app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    auth = getAuth(app);
+
+                    // 認証実行（CustomToken優先、なければ匿名認証）
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            currentUser = user;
+                            updateSyncStatus(true, "履歴同期済み");
+                            subscribeToSessions(user.uid);
+                        }
+                    });
+                } else {
+                    // ローカルフォールバック（環境変数未定義時）
+                    updateSyncStatus(false, "オフラインモード");
+                    createNewSession(false);
+                }
+            } catch (error) {
+                console.error("初期化エラー:", error);
+                updateSyncStatus(false, "接続エラー");
+                createNewSession(false);
+            }
+        }
+
+        // 同期ステータスUI更新
+        function updateSyncStatus(isConnected, text) {
+            const indicator = document.getElementById('syncIndicator');
+            const statusText = document.getElementById('syncStatusText');
+            indicator.className = isConnected 
+                ? "w-2 h-2 rounded-full bg-emerald-400" 
+                : "w-2 h-2 rounded-full bg-amber-400";
+            statusText.textContent = text;
+        }
+
+        // Firestoreから会話履歴をリアルタイム取得
+        function subscribeToSessions(userId) {
+            if (!db || !userId) return;
+            if (unsubscribeSessions) unsubscribeSessions();
+
+            const sessionsRef = collection(db, 'artifacts', appId, 'users', userId, 'filegen_sessions');
+            
+            unsubscribeSessions = onSnapshot(sessionsRef, (snapshot) => {
+                const loadedSessions = [];
+                snapshot.forEach((docSnap) => {
+                    loadedSessions.push({ id: docSnap.id, ...docSnap.data() });
+                });
+
+                // メモリ上で更新日時の降順にソート
+                loadedSessions.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+                sessions = loadedSessions;
+
+                renderSidebar();
+
+                // 初回ロード時または選択中のセッションが存在しない場合の処理
+                if (!currentSessionId) {
+                    if (sessions.length > 0) {
+                        selectSession(sessions[0].id);
+                    } else {
+                        createNewSession(false);
+                    }
+                } else {
+                    const active = sessions.find(s => s.id === currentSessionId);
+                    if (active) {
+                        renderMessages(active);
+                    }
+                }
+            }, (error) => {
+                console.error("履歴取得エラー:", error);
+                updateSyncStatus(false, "同期エラー");
+            });
+        }
+
+        // サイドバーの履歴一覧を描画
+        function renderSidebar() {
+            const listEl = document.getElementById('sessionList');
+            const countEl = document.getElementById('sessionCount');
+            countEl.textContent = sessions.length;
+
+            if (sessions.length === 0) {
+                listEl.innerHTML = `
+                    <div class="text-center py-8 px-4 text-xs md-text-variant">
+                        保存された会話履歴はありません。<br>メッセージを送ると自動的に保存されます。
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = sessions.map(session => {
+                const isActive = session.id === currentSessionId;
+                const dateStr = formatDate(session.updatedAt);
+                return `
+                    <button onclick="selectSession('${session.id}')" class="w-full text-left px-4 py-3 rounded-full transition-all flex items-center gap-3 group ${isActive ? 'md-secondary-container font-semibold' : 'md-text-variant hover:opacity-80'}">
+                        <i data-lucide="message-square" class="w-4 h-4 flex-shrink-0 ${isActive ? 'md-text-primary' : ''}"></i>
+                        <div class="min-w-0 flex-1 flex items-center justify-between gap-2">
+                            <span class="text-sm truncate">${escapeHtml(session.title || '無題のチャット')}</span>
+                            <span class="text-[10px] opacity-75 flex-shrink-0">${dateStr}</span>
+                        </div>
+                    </button>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        // 新しいチャットを作成
+        window.createNewSession = function(closeMobileSidebar = true) {
+            const newId = 'session_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+            const newSession = {
+                id: newId,
+                title: '新しいチャット',
+                messages: [],
+                updatedAt: Date.now(),
+                isDraft: true // まだメッセージが送信されていない状態
+            };
+
+            // 既存のドラフトがあれば置き換え
+            sessions = sessions.filter(s => !s.isDraft);
+            sessions.unshift(newSession);
+            
+            selectSession(newId);
+            if (closeMobileSidebar && window.innerWidth < 768) {
+                toggleSidebar();
+            }
+        };
+
+        // セッションを選択して表示
+        window.selectSession = function(sessionId) {
+            currentSessionId = sessionId;
+            const session = sessions.find(s => s.id === sessionId);
+            if (!session) return;
+
+            document.getElementById('currentChatTitle').textContent = session.title || '新しいチャット';
+            renderSidebar();
+            renderMessages(session);
+
+            if (window.innerWidth < 768) {
+                const sidebar = document.getElementById('sidebar');
+                if (!sidebar.classList.contains('-translate-x-full')) {
+                    toggleSidebar();
+                }
+            }
+        };
+
+        // メッセージ履歴を描画
+        function renderMessages(session) {
+            const welcomeEl = document.getElementById('welcomeScreen');
+            const listEl = document.getElementById('messagesList');
+
+            if (!session.messages || session.messages.length === 0) {
+                welcomeEl.classList.remove('hidden');
+                listEl.classList.add('hidden');
+                listEl.innerHTML = '';
+                return;
+            }
+
+            welcomeEl.classList.add('hidden');
+            listEl.classList.remove('hidden');
+
+            listEl.innerHTML = session.messages.map((msg, index) => {
+                const isUser = msg.role === 'user';
+                if (isUser) {
+                    return `
+                        <div class="flex justify-end gap-3">
+                            <div class="max-w-[85%] sm:max-w-[75%] md-primary px-5 py-3.5 rounded-[24px] rounded-br-md shadow-xs text-sm sm:text-base whitespace-pre-wrap leading-relaxed">${escapeHtml(msg.text)}</div>
+                        </div>
+                    `;
+                } else {
+                    // FilegenAPI コマンドの解析とファイルカード生成
+                    const { cleanText, generatedFiles } = FilegenAPI.parseResponse(msg.text || '');
+                    const parsedHtml = cleanText ? marked.parse(cleanText) : '';
+                    
+                    let filesHtml = '';
+                    if (generatedFiles.length > 0) {
+                        filesHtml = `<div class="space-y-3 ${parsedHtml ? 'mt-3' : ''}">` + generatedFiles.map((file, fIdx) => {
+                            const highlighted = (file.lang && hljs.getLanguage(file.lang))
+                                ? hljs.highlight(file.content, { language: file.lang }).value
+                                : hljs.highlightAuto(file.content).value;
+                            const isHtmlFile = file.ext === 'html' || file.ext === 'htm';
+                            return `
+                                <div class="border md-border-variant md-surface-high rounded-3xl overflow-hidden shadow-xs">
+                                    <div class="md-primary-container px-4 py-3 flex items-center justify-between gap-2">
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <span class="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider md-primary rounded-full flex-shrink-0">FilegenAPI</span>
+                                            <i data-lucide="file-code" class="w-4 h-4 flex-shrink-0"></i>
+                                            <span class="font-mono text-xs sm:text-sm font-semibold truncate">${escapeHtml(file.filename)}</span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5 flex-shrink-0">
+                                            ${isHtmlFile ? `
+                                            <button onclick="previewGeneratedHtml(${index}, ${fIdx})" title="HTMLプレビューウィンドウで開く" class="px-3 py-1.5 text-xs font-semibold md-secondary-container hover:opacity-90 rounded-full transition-opacity flex items-center gap-1">
+                                                <i data-lucide="play" class="w-3.5 h-3.5"></i>
+                                                <span>プレビュー</span>
+                                            </button>
+                                            ` : ''}
+                                            <button onclick="copyGeneratedFile(${index}, ${fIdx})" title="コードをコピー" class="px-3 py-1.5 text-xs font-semibold md-surface-high hover:opacity-90 rounded-full transition-opacity flex items-center gap-1">
+                                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                                <span class="hidden sm:inline">コピー</span>
+                                            </button>
+                                            <button onclick="downloadGeneratedFile(${index}, ${fIdx})" class="px-3.5 py-1.5 text-xs font-semibold md-primary hover:brightness-110 rounded-full transition-all flex items-center gap-1">
+                                                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                                                <span>保存</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="max-h-72 overflow-y-auto bg-[#0d1117] p-4 text-xs sm:text-sm text-slate-100">
+                                        <pre class="!m-0 !p-0 !bg-transparent"><code class="hljs language-${file.lang}">${highlighted}</code></pre>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('') + `</div>`;
+                    }
+
+                    return `
+                        <div class="flex items-start gap-3">
+                            <div class="w-9 h-9 rounded-2xl md-primary-container flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            </div>
+                            <div class="min-w-0 flex-1 md-surface-low px-5 py-4 rounded-[24px] rounded-tl-md text-sm sm:text-base">
+                                ${parsedHtml ? `<div class="markdown-body">${parsedHtml}</div>` : ''}
+                                ${filesHtml}
+                                <div class="mt-3 pt-2 border-t md-border-variant flex items-center justify-end gap-2">
+                                    <button onclick="copyMessageText(${index})" class="text-xs font-medium md-text-variant hover:opacity-80 flex items-center gap-1.5 py-1.5 px-3 rounded-full md-surface transition-colors">
+                                        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                        <span>全文コピー</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+
+            // 生成中インジケーターの追加（AIの思考ステップ表示）
+            if (isGenerating) {
+                const statusLabel = currentThinkingStep || "思考中...";
+                listEl.innerHTML += `
+                    <div id="typingIndicator" class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-2xl md-primary-container flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        </div>
+                        <div class="md-surface-low px-5 py-4 rounded-[24px] rounded-tl-md flex flex-col gap-2 max-w-md border md-border-variant">
+                            <div class="flex items-center gap-2 text-xs font-semibold md-text-primary">
+                                <span class="w-2 h-2 md-primary rounded-full typing-dot"></span>
+                                <span class="w-2 h-2 md-primary rounded-full typing-dot"></span>
+                                <span class="w-2 h-2 md-primary rounded-full typing-dot"></span>
+                                <span id="thinkingStatusText" class="ml-1">${escapeHtml(statusLabel)}</span>
+                            </div>
+                            <p class="text-xs md-text-variant leading-relaxed">リクエストの意図と必要な出力形式（文章・FilegenAPI）を整理しています...</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            lucide.createIcons();
+            scrollToBottom();
+        }
+
+        // FilegenAPI: AIが出力する /generate -<ext> コマンドを解釈して単一ファイルオブジェクトを生成するAPI
+        const FilegenAPI = {
+            extToLang: {
+                'sh': 'bash', 'bash': 'bash', 'zsh': 'bash',
+                'py': 'python', 'js': 'javascript', 'ts': 'typescript',
+                'html': 'html', 'css': 'css', 'json': 'json',
+                'md': 'markdown', 'txt': 'plaintext', 'sql': 'sql',
+                'go': 'go', 'rs': 'rust', 'java': 'java', 'cpp': 'cpp', 'c': 'c',
+                'rb': 'ruby', 'php': 'php', 'yaml': 'yaml', 'yml': 'yaml'
+            },
+            parseResponse(rawText) {
+                const generatedFiles = [];
+                // /generate -<拡張子> [任意のファイル名] に続くコードブロックを検出
+                const regex = /\/generate\s+-([a-zA-Z0-9]+)(?:\s+([^\s\n`]+))?\s*\n+```[a-zA-Z0-9_-]*\n([\s\S]*?)```/g;
+                
+                const cleanText = rawText.replace(regex, (match, ext, customName, codeContent) => {
+                    const normalizedExt = ext.toLowerCase();
+                    let filename = customName ? customName.trim() : `generated_${Date.now().toString().slice(-4)}.${normalizedExt}`;
+                    if (!filename.includes('.')) {
+                        filename += `.${normalizedExt}`;
+                    }
+                    const lang = this.extToLang[normalizedExt] || normalizedExt;
+                    generatedFiles.push({
+                        ext: normalizedExt,
+                        filename: filename,
+                        lang: lang,
+                        content: codeContent.replace(/\n$/, '')
+                    });
+                    return ''; // 本文からはコマンドと生コードブロックを除去し、専用UIカードに置き換える
+                }).trim();
+
+                return { cleanText, generatedFiles };
+            },
+            downloadFile(filename, content) {
+                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        };
+        window.FilegenAPI = FilegenAPI;
+
+        // 生成ファイルのダウンロード＆コピーハンドラ
+        window.downloadGeneratedFile = function(msgIndex, fileIndex) {
+            const session = sessions.find(s => s.id === currentSessionId);
+            if (!session || !session.messages[msgIndex]) return;
+            const { generatedFiles } = FilegenAPI.parseResponse(session.messages[msgIndex].text || '');
+            const file = generatedFiles[fileIndex];
+            if (file) {
+                FilegenAPI.downloadFile(file.filename, file.content);
+                showToast(`${file.filename} をダウンロードしました`);
+            }
+        };
+
+        window.copyGeneratedFile = function(msgIndex, fileIndex) {
+            const session = sessions.find(s => s.id === currentSessionId);
+            if (!session || !session.messages[msgIndex]) return;
+            const { generatedFiles } = FilegenAPI.parseResponse(session.messages[msgIndex].text || '');
+            const file = generatedFiles[fileIndex];
+            if (file) {
+                const textarea = document.createElement('textarea');
+                textarea.value = file.content;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast(`${file.filename} のコードをコピーしました`);
+            }
+        };
+
+        // Firestoreへセッションを保存
+        async function saveSessionToFirestore(session) {
+            if (!db || !currentUser) return;
+            try {
+                updateSyncStatus(true, "保存中...");
+                const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'filegen_sessions', session.id);
+                const dataToSave = {
+                    title: session.title,
+                    messages: session.messages,
+                    updatedAt: session.updatedAt
+                };
+                await setDoc(docRef, dataToSave);
+                updateSyncStatus(true, "履歴同期済み");
+            } catch (error) {
+                console.error("保存エラー:", error);
+                updateSyncStatus(false, "保存失敗");
+            }
+        }
+
+        // メッセージ送信処理
+        window.handleSendMessage = async function(e) {
+            if (e) e.preventDefault();
+            if (isGenerating) return;
+
+            const inputEl = document.getElementById('messageInput');
+            const text = inputEl.value.trim();
+            if (!text) return;
+
+            inputEl.value = '';
+            inputEl.style.height = 'auto';
+
+            let session = sessions.find(s => s.id === currentSessionId);
+            if (!session) {
+                createNewSession(false);
+                session = sessions.find(s => s.id === currentSessionId);
+            }
+
+            // 初回メッセージの場合はタイトルを自動設定
+            if (session.messages.length === 0) {
+                session.title = text.length > 24 ? text.substring(0, 24) + '...' : text;
+                document.getElementById('currentChatTitle').textContent = session.title;
+            }
+
+            session.isDraft = false;
+            session.messages.push({ role: 'user', text: text, timestamp: Date.now() });
+            session.updatedAt = Date.now();
+
+            isGenerating = true;
+            document.getElementById('sendBtn').disabled = true;
+            renderMessages(session);
+            renderSidebar();
+
+            // ユーザー発言を即座に保存
+            await saveSessionToFirestore(session);
+
+            // 思考ステップの動的更新を開始
+            const thinkingSteps = [
+                "質問の意図と文脈を分析中...",
+                "最適な構成と回答ポイントを整理中...",
+                "FilegenAPIやコード生成が必要か判定中...",
+                "わかりやすい回答文を作成中..."
+            ];
+            let stepIdx = 0;
+            currentThinkingStep = thinkingSteps[0];
+            renderMessages(session);
+            thinkingInterval = setInterval(() => {
+                stepIdx = (stepIdx + 1) % thinkingSteps.length;
+                currentThinkingStep = thinkingSteps[stepIdx];
+                const statusEl = document.getElementById('thinkingStatusText');
+                if (statusEl) {
+                    statusEl.textContent = currentThinkingStep;
+                }
+            }, 1800);
+
+            // Vercel Serverless API (/api/chat) 呼び出し
+            try {
+                const replyText = await callGeminiAPI(session.messages);
+                session.messages.push({ role: 'model', text: replyText, timestamp: Date.now() });
+                session.updatedAt = Date.now();
+            } catch (error) {
+                session.messages.push({ 
+                    role: 'model', 
+                    text: "申し訳ありません。応答の生成中にエラーが発生しました。Vercelの環境変数 `GEMINI_API_KEY` が設定されているか確認して、再度お試しください。", 
+                    timestamp: Date.now() 
+                });
+            } finally {
+                if (thinkingInterval) {
+                    clearInterval(thinkingInterval);
+                    thinkingInterval = null;
+                }
+                currentThinkingStep = "";
+                isGenerating = false;
+                document.getElementById('sendBtn').disabled = false;
+                renderMessages(session);
+                renderSidebar();
+                await saveSessionToFirestore(session);
+            }
+        };
+
+        // Vercel Serverless API (/api/chat) 呼び出し（指数バックオフ付き）
+        async function callGeminiAPI(messages) {
+            // 会話履歴をAPIフォーマットに変換（直近20件に制限してコンテキストを最適化）
+            const recentMessages = messages.slice(-20);
+            const contents = recentMessages.map(m => ({
+                role: m.role === 'user' ? 'user' : 'model',
+                parts: [{ text: m.text }]
+            }));
+
+            let baseSystemPrompt = `あなたは「FileGen」という優秀で親しみやすいAIアシスタントです。ユーザーのドキュメント作成、プログラミング、アイデア出し、文章校正などを的確にサポートします。
+
+【FilegenAPI 仕様】
+あなたは単一ファイルを生成・出力するための専用API「FilegenAPI」を搭載しています。
+ユーザーからスクリプト、プログラム、設定ファイル、ドキュメント等の作成を求められた場合、または単一ファイルとして出力すべき場面では、以下のコマンド構文を使用して出力してください。システムが自動的に単一ファイルとしてパッケージ化し、ダウンロード可能なUIを生成します。
+
+構文:
+/generate -<拡張子> <ファイル名>
+\`\`\`<言語名>
+<ファイルの完全な内容>
+\`\`\`
+
+使用例:
+- シェルスクリプトの場合:
+/generate -sh setup.sh
+\`\`\`bash
+#!/bin/bash
+echo "Hello FileGen!"
+\`\`\`
+
+- Pythonスクリプトの場合:
+/generate -py main.py
+\`\`\`python
+print("Hello FileGen!")
+\`\`\`
+
+- HTMLファイルの場合:
+/generate -html index.html
+\`\`\`html
+<!DOCTYPE html>
+<html><body><h1>Hello</h1></body></html>
+\`\`\`
+
+※FilegenAPIを使用する際は、省略やプレースホルダーを使わず、そのまま実行・利用できる完全な単一ファイルの内容を出力してください。`;
+
+            const currentSession = sessions.find(s => s.id === currentSessionId);
+            const payload = {
+                sessionId: currentSessionId,
+                userId: currentUser ? currentUser.uid : 'guest',
+                title: currentSession ? currentSession.title : '新しいチャット',
+                contents: contents,
+                systemInstruction: {
+                    parts: [{
+                        text: baseSystemPrompt
+                    }]
+                }
+            };
+
+            const delays = [1000, 2000, 4000, 8000];
+            for (let attempt = 0; attempt <= delays.length; attempt++) {
+                try {
+                    const response = await fetch(CHAT_API_ENDPOINT, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (candidateText) {
+                        return candidateText;
+                    } else {
+                        throw new Error("Empty response from Gemini");
+                    }
+                } catch (err) {
+                    if (attempt === delays.length) throw err;
+                    await new Promise(resolve => setTimeout(resolve, delays[attempt]));
+                }
+            }
+        }
+
+        // クイックプロンプトの実行
+        window.usePrompt = function(promptText) {
+            const inputEl = document.getElementById('messageInput');
+            inputEl.value = promptText;
+            autoResizeTextarea(inputEl);
+            handleSendMessage();
+        };
+
+        // メッセージのコピー機能
+        window.copyMessageText = function(index) {
+            const session = sessions.find(s => s.id === currentSessionId);
+            if (!session || !session.messages[index]) return;
+
+            const textToCopy = session.messages[index].text;
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            showToast('クリップボードにコピーしました');
+        };
+
+        // 会話履歴のMarkdownエクスポート
+        window.exportCurrentChat = function() {
+            const session = sessions.find(s => s.id === currentSessionId);
+            if (!session || session.messages.length === 0) {
+                showToast('エクスポートする会話がありません');
+                return;
+            }
+
+            let mdContent = `# ${session.title}\n\n`;
+            session.messages.forEach(msg => {
+                const sender = msg.role === 'user' ? 'ユーザー' : 'FileGen';
+                mdContent += `### ${sender}\n${msg.text}\n\n---\n\n`;
+            });
+
+            const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${session.title.replace(/[\\/:*?"<>|]/g, '_')}.md`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Markdownファイルをダウンロードしました');
+        };
+
+        // タイトル編集モーダル操作
+        window.openRenameModal = function() {
+            const session = sessions.find(s => s.id === currentSessionId);
+            if (!session) return;
+            document.getElementById('renameInput').value = session.title;
+            const modal = document.getElementById('renameModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.closeRenameModal = function() {
+            const modal = document.getElementById('renameModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        window.confirmRename = async function() {
+            const newTitle = document.getElementById('renameInput').value.trim();
+            if (!newTitle) return;
+
+            const session = sessions.find(s => s.id === currentSessionId);
+            if (session) {
+                session.title = newTitle;
+                session.updatedAt = Date.now();
+                document.getElementById('currentChatTitle').textContent = newTitle;
+                renderSidebar();
+                if (!session.isDraft) {
+                    await saveSessionToFirestore(session);
+                }
+                showToast('タイトルを更新しました');
+            }
+            closeRenameModal();
+        };
+
+        // 削除確認モーダル操作
+        window.openDeleteModal = function() {
+            const modal = document.getElementById('deleteModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.closeDeleteModal = function() {
+            const modal = document.getElementById('deleteModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        window.confirmDelete = async function() {
+            if (!currentSessionId) return;
+            const targetId = currentSessionId;
+            const session = sessions.find(s => s.id === targetId);
+
+            sessions = sessions.filter(s => s.id !== targetId);
+            currentSessionId = null;
+
+            if (db && currentUser && session && !session.isDraft) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'filegen_sessions', targetId);
+                    await deleteDoc(docRef);
+                } catch (error) {
+                    console.error("削除エラー:", error);
+                }
+            }
+
+            closeDeleteModal();
+            showToast('会話を削除しました');
+
+            if (sessions.length > 0) {
+                selectSession(sessions[0].id);
+            } else {
+                createNewSession(false);
+            }
+        };
+
+        // 設定モーダル操作（Material You テーマ ＆ 追加プロンプト ＆ Cookie保存）
+        function applyTheme(color, mode) {
+            document.documentElement.setAttribute('data-theme', color);
+            document.documentElement.setAttribute('data-mode', mode);
+            updateThemeModalUI(color, mode);
+        }
+
+        function updateThemeModalUI(color, mode) {
+            const lightBtn = document.getElementById('modeLightBtn');
+            const darkBtn = document.getElementById('modeDarkBtn');
+            if (lightBtn && darkBtn) {
+                if (mode === 'light') {
+                    lightBtn.className = "px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all md-secondary-container";
+                    darkBtn.className = "px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all md-text-variant";
+                } else {
+                    darkBtn.className = "px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all md-secondary-container";
+                    lightBtn.className = "px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all md-text-variant";
+                }
+            }
+
+            document.querySelectorAll('.theme-swatch').forEach(btn => {
+                const isSelected = btn.getAttribute('data-color-btn') === color;
+                const checkIcon = btn.querySelector('.swatch-check');
+                if (isSelected) {
+                    btn.style.borderColor = 'var(--md-primary)';
+                    btn.classList.add('md-surface');
+                    if (checkIcon) checkIcon.classList.remove('hidden');
+                } else {
+                    btn.style.borderColor = 'transparent';
+                    btn.classList.remove('md-surface');
+                    if (checkIcon) checkIcon.classList.add('hidden');
+                }
+            });
+        }
+
+        window.selectThemeColor = function(color) {
+            currentThemeColor = color;
+            applyTheme(currentThemeColor, currentThemeMode);
+        };
+
+        window.selectThemeMode = function(mode) {
+            currentThemeMode = mode;
+            applyTheme(currentThemeColor, currentThemeMode);
+        };
+
+        window.openThemeModal = function() {
+            updateThemeModalUI(currentThemeColor, currentThemeMode);
+            const modal = document.getElementById('themeModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.closeThemeModal = function() {
+            const modal = document.getElementById('themeModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        window.saveThemeSettings = function() {
+            setCookie('filegen_theme_color', currentThemeColor, 365);
+            setCookie('filegen_theme_mode', currentThemeMode, 365);
+            closeThemeModal();
+            showToast('テーマ設定をCookieに保存しました');
+        };
+
+        window.openSettingsModal = function() {
+            document.getElementById('customPromptInput').value = customPrompt;
+            const modal = document.getElementById('settingsModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.closeSettingsModal = function() {
+            const modal = document.getElementById('settingsModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        window.savePromptSettings = function() {
+            const val = document.getElementById('customPromptInput').value;
+            customPrompt = val;
+            setCookie('filegen_custom_prompt', customPrompt, 365);
+            closeSettingsModal();
+            showToast('追加プロンプトをCookieに保存しました');
+        };
+
+        window.clearCustomPrompt = function() {
+            document.getElementById('customPromptInput').value = '';
+            customPrompt = '';
+            setCookie('filegen_custom_prompt', '', -1);
+            showToast('追加プロンプトをリセットしました');
+        };
+
+        // ツールメニュー ＆ HTMLプレビューフローティングウィンドウ機能
+        let isPreviewMaximized = false;
+        let isPreviewMinimized = false;
+        let savedWindowRect = null;
+
+        const DEFAULT_PREVIEW_HTML = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background: linear-gradient(135deg, #f8fafc, #e0e7ff); color: #1e293b; text-align: center; padding: 20px; box-sizing: border-box; }
+  .card { background: white; padding: 28px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); max-width: 380px; }
+  h2 { margin-top: 0; color: #4f46e5; }
+  p { font-size: 14px; line-height: 1.6; color: #475569; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h2>HTML Preview Tool</h2>
+    <p>右上の「HTML」タブからコードを編集するか、FilegenAPIで生成されたHTMLの「プレビュー」ボタンから表示できます。</p>
+  </div>
+</body>
+</html>`;
+
+        window.toggleToolsMenu = function(e) {
+            if (e) e.stopPropagation();
+            const dropdown = document.getElementById('toolsDropdown');
+            dropdown.classList.toggle('hidden');
+        };
+
+        document.addEventListener('click', (e) => {
+            const wrapper = document.getElementById('toolsMenuWrapper');
+            const dropdown = document.getElementById('toolsDropdown');
+            if (wrapper && dropdown && !wrapper.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+
+            const handle = document.getElementById('previewPillHandle');
+            const optionsMenu = document.getElementById('windowOptionsMenu');
+            if (handle && optionsMenu && !handle.contains(e.target) && !optionsMenu.contains(e.target)) {
+                optionsMenu.classList.add('hidden');
+            }
+        });
+
+        window.openHtmlPreviewWindow = function(htmlContent = null) {
+            const dropdown = document.getElementById('toolsDropdown');
+            if (dropdown) dropdown.classList.add('hidden');
+
+            const win = document.getElementById('htmlPreviewWindow');
+            const sourceEl = document.getElementById('htmlPreviewSource');
+
+            if (htmlContent !== null) {
+                sourceEl.value = htmlContent;
+            } else if (!sourceEl.value.trim()) {
+                sourceEl.value = DEFAULT_PREVIEW_HTML;
+            }
+
+            updateHtmlPreviewFrame();
+            win.classList.remove('hidden');
+            win.classList.add('flex');
+
+            if (isPreviewMinimized) {
+                toggleMinimizePreviewWindow();
+            }
+            switchPreviewTab('preview');
+            lucide.createIcons();
+        };
+
+        window.closeHtmlPreviewWindow = function() {
+            const win = document.getElementById('htmlPreviewWindow');
+            const optionsMenu = document.getElementById('windowOptionsMenu');
+            if (optionsMenu) optionsMenu.classList.add('hidden');
+            win.classList.add('hidden');
+            win.classList.remove('flex');
+        };
+
+        window.previewGeneratedHtml = function(msgIndex, fileIndex) {
+            const session = sessions.find(s => s.id === currentSessionId);
+            if (!session || !session.messages[msgIndex]) return;
+            const { generatedFiles } = FilegenAPI.parseResponse(session.messages[msgIndex].text || '');
+            const file = generatedFiles[fileIndex];
+            if (file) {
+                openHtmlPreviewWindow(file.content);
+                showToast(`${file.filename} をプレビュー表示しました`);
+            }
+        };
+
+        window.updateHtmlPreviewFrame = function() {
+            const sourceEl = document.getElementById('htmlPreviewSource');
+            const frame = document.getElementById('htmlPreviewFrame');
+            if (sourceEl && frame) {
+                frame.srcdoc = sourceEl.value;
+            }
+        };
+
+        window.switchPreviewTab = function(tab) {
+            const frame = document.getElementById('htmlPreviewFrame');
+            const editor = document.getElementById('htmlCodeEditorArea');
+            const previewBtn = document.getElementById('tabPreviewBtn');
+            const codeBtn = document.getElementById('tabCodeBtn');
+
+            if (tab === 'preview') {
+                frame.classList.remove('hidden');
+                editor.classList.add('hidden');
+                previewBtn.className = "px-2.5 py-1 rounded-full text-[11px] font-semibold md-primary transition-all";
+                codeBtn.className = "px-2.5 py-1 rounded-full text-[11px] font-semibold md-text-variant transition-all";
+            } else {
+                frame.classList.add('hidden');
+                editor.classList.remove('hidden');
+                codeBtn.className = "px-2.5 py-1 rounded-full text-[11px] font-semibold md-primary transition-all";
+                previewBtn.className = "px-2.5 py-1 rounded-full text-[11px] font-semibold md-text-variant transition-all";
+            }
+        };
+
+        window.toggleMaximizePreviewWindow = function() {
+            const win = document.getElementById('htmlPreviewWindow');
+            const optionsMenu = document.getElementById('windowOptionsMenu');
+            optionsMenu.classList.add('hidden');
+
+            if (isPreviewMinimized) {
+                toggleMinimizePreviewWindow();
+            }
+
+            if (!isPreviewMaximized) {
+                savedWindowRect = {
+                    top: win.style.top,
+                    left: win.style.left,
+                    width: win.style.width,
+                    height: win.style.height
+                };
+                win.style.top = '16px';
+                win.style.left = '16px';
+                win.style.width = 'calc(100vw - 32px)';
+                win.style.height = 'calc(100vh - 32px)';
+                isPreviewMaximized = true;
+            } else {
+                if (savedWindowRect) {
+                    win.style.top = savedWindowRect.top;
+                    win.style.left = savedWindowRect.left;
+                    win.style.width = savedWindowRect.width;
+                    win.style.height = savedWindowRect.height;
+                }
+                isPreviewMaximized = false;
+            }
+        };
+
+        window.toggleMinimizePreviewWindow = function() {
+            const win = document.getElementById('htmlPreviewWindow');
+            const body = document.getElementById('previewWindowBody');
+            const optionsMenu = document.getElementById('windowOptionsMenu');
+            optionsMenu.classList.add('hidden');
+
+            if (!isPreviewMinimized) {
+                if (!isPreviewMaximized) {
+                    savedWindowRect = {
+                        top: win.style.top,
+                        left: win.style.left,
+                        width: win.style.width,
+                        height: win.style.height
+                    };
+                }
+                body.classList.add('hidden');
+                win.style.minHeight = 'auto';
+                win.style.height = 'auto';
+                isPreviewMinimized = true;
+                isPreviewMaximized = false;
+            } else {
+                body.classList.remove('hidden');
+                win.style.minHeight = '220px';
+                win.style.height = (savedWindowRect && savedWindowRect.height) ? savedWindowRect.height : '480px';
+                isPreviewMinimized = false;
+            }
+        };
+
+        window.resetPreviewWindowPosition = function() {
+            const win = document.getElementById('htmlPreviewWindow');
+            const body = document.getElementById('previewWindowBody');
+            const optionsMenu = document.getElementById('windowOptionsMenu');
+            optionsMenu.classList.add('hidden');
+
+            body.classList.remove('hidden');
+            win.style.minHeight = '220px';
+            win.style.top = '84px';
+            win.style.left = 'max(16px, calc(50% - 260px))';
+            win.style.width = 'min(520px, 92vw)';
+            win.style.height = '480px';
+            isPreviewMaximized = false;
+            isPreviewMinimized = false;
+        };
+
+        // ピル型ハンドルのドラッグ移動 ＆ クリックでオプション表示セットアップ
+        function setupPreviewWindowControls() {
+            const win = document.getElementById('htmlPreviewWindow');
+            const handle = document.getElementById('previewPillHandle');
+            const resizeHandle = document.getElementById('previewResizeHandle');
+            const optionsMenu = document.getElementById('windowOptionsMenu');
+            const frame = document.getElementById('htmlPreviewFrame');
+
+            if (!win || !handle) return;
+
+            let isDragging = false;
+            let hasMoved = false;
+            let startX = 0, startY = 0, initialLeft = 0, initialTop = 0;
+
+            const onDragStart = (clientX, clientY) => {
+                if (isPreviewMaximized) return;
+                isDragging = true;
+                hasMoved = false;
+                startX = clientX;
+                startY = clientY;
+                const rect = win.getBoundingClientRect();
+                initialLeft = rect.left;
+                initialTop = rect.top;
+                if (frame) frame.style.pointerEvents = 'none';
+            };
+
+            const onDragMove = (clientX, clientY) => {
+                if (!isDragging) return;
+                const dx = clientX - startX;
+                const dy = clientY - startY;
+                if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+                    hasMoved = true;
+                    optionsMenu.classList.add('hidden');
+                }
+                if (hasMoved) {
+                    const maxLeft = window.innerWidth - win.offsetWidth;
+                    const maxTop = window.innerHeight - 48;
+                    const nextLeft = Math.max(0, Math.min(maxLeft, initialLeft + dx));
+                    const nextTop = Math.max(0, Math.min(maxTop, initialTop + dy));
+                    win.style.left = `${nextLeft}px`;
+                    win.style.top = `${nextTop}px`;
+                }
+            };
+
+            const onDragEnd = () => {
+                if (!isDragging) return;
+                isDragging = false;
+                if (frame) frame.style.pointerEvents = 'auto';
+                // ドラッグ移動していなければクリック扱いでウィンドウオプションメニューを開閉
+                if (!hasMoved) {
+                    optionsMenu.classList.toggle('hidden');
+                    lucide.createIcons();
+                }
+            };
+
+            handle.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                onDragStart(e.clientX, e.clientY);
+            });
+            window.addEventListener('mousemove', (e) => onDragMove(e.clientX, e.clientY));
+            window.addEventListener('mouseup', onDragEnd);
+
+            handle.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    onDragStart(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }, { passive: true });
+            window.addEventListener('touchmove', (e) => {
+                if (isDragging && e.touches.length === 1) {
+                    onDragMove(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }, { passive: true });
+            window.addEventListener('touchend', onDragEnd);
+
+            // 右下リサイズ処理
+            if (resizeHandle) {
+                let isResizing = false;
+                let rStartX = 0, rStartY = 0, rInitW = 0, rInitH = 0;
+
+                const onResizeStart = (clientX, clientY) => {
+                    isResizing = true;
+                    isPreviewMaximized = false;
+                    rStartX = clientX;
+                    rStartY = clientY;
+                    rInitW = win.offsetWidth;
+                    rInitH = win.offsetHeight;
+                    if (frame) frame.style.pointerEvents = 'none';
+                };
+
+                const onResizeMove = (clientX, clientY) => {
+                    if (!isResizing) return;
+                    const newW = Math.max(300, Math.min(window.innerWidth - win.offsetLeft - 8, rInitW + (clientX - rStartX)));
+                    const newH = Math.max(220, Math.min(window.innerHeight - win.offsetTop - 8, rInitH + (clientY - rStartY)));
+                    win.style.width = `${newW}px`;
+                    win.style.height = `${newH}px`;
+                };
+
+                const onResizeEnd = () => {
+                    if (!isResizing) return;
+                    isResizing = false;
+                    if (frame) frame.style.pointerEvents = 'auto';
+                };
+
+                resizeHandle.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onResizeStart(e.clientX, e.clientY);
+                });
+                window.addEventListener('mousemove', (e) => onResizeMove(e.clientX, e.clientY));
+                window.addEventListener('mouseup', onResizeEnd);
+            }
+        }
+        setupPreviewWindowControls();
+
+        // ユーティリティ関数
+        window.toggleSidebar = function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        };
+
+        window.autoResizeTextarea = function(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+        };
+
+        window.handleKeyDown = function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+            }
+        };
+
+        function scrollToBottom() {
+            const container = document.getElementById('chatContainer');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.remove('opacity-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+            }, 2500);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>"']/g, function(m) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[m];
+            });
+        }
+
+        function formatDate(timestamp) {
+            if (!timestamp) return '';
+            const d = new Date(timestamp);
+            const now = new Date();
+            const isToday = d.toDateString() === now.toDateString();
+            const hours = String(d.getHours()).padStart(2, '0');
+            const minutes = String(d.getMinutes()).padStart(2, '0');
+            if (isToday) {
+                return `今日 ${hours}:${minutes}`;
+            }
+            return `${d.getMonth() + 1}/${d.getDate()} ${hours}:${minutes}`;
+        }
+
+        // アプリ起動
+        initApp();
+
+        // ボタン＆ハンドルUI向けM3リップルアニメーション（長押し中維持対応）
+        (function initRippleEffect() {
+            const activeRipples = new Map();
+
+            function getRippleTarget(el) {
+                if (!el || typeof el.closest !== 'function') return null;
+                return el.closest('button, [role="button"], #previewPillHandle');
+            }
+
+            function spawnRipple(target, clientX, clientY) {
+                if (!target || target.disabled) return;
+
+                // 既存の未解放リップルがあればクリーンアップ
+                releaseRipple(target);
+
+                const rect = target.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height) * 2.2;
+                const x = (typeof clientX === 'number' && clientX > 0) ? clientX - rect.left : rect.width / 2;
+                const y = (typeof clientY === 'number' && clientY > 0) ? clientY - rect.top : rect.height / 2;
+
+                const ripple = document.createElement('span');
+                ripple.className = 'md-ripple';
+                ripple.style.width = `${size}px`;
+                ripple.style.height = `${size}px`;
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+
+                target.appendChild(ripple);
+                activeRipples.set(target, ripple);
+
+                // 次フレームで展開し、押下中は維持する
+                requestAnimationFrame(() => {
+                    ripple.classList.add('is-expanded');
+                });
+            }
+
+            function releaseRipple(target) {
+                const ripple = target ? activeRipples.get(target) : null;
+                if (!ripple) return;
+                activeRipples.delete(target);
+
+                ripple.classList.add('is-releasing');
+                setTimeout(() => {
+                    if (ripple.parentNode) {
+                        ripple.parentNode.removeChild(ripple);
+                    }
+                }, 460);
+            }
+
+            function releaseAllRipples() {
+                Array.from(activeRipples.keys()).forEach((target) => releaseRipple(target));
+            }
+
+            document.addEventListener('pointerdown', (e) => {
+                if (e.button !== undefined && e.button !== 0 && e.pointerType === 'mouse') return;
+                const target = getRippleTarget(e.target);
+                if (target) {
+                    spawnRipple(target, e.clientX, e.clientY);
+                }
+            }, { passive: true });
+
+            document.addEventListener('pointerup', releaseAllRipples, { passive: true });
+            document.addEventListener('pointercancel', releaseAllRipples, { passive: true });
+            window.addEventListener('blur', releaseAllRipples);
+        })();
+    </script>
+</body>
+</html>
