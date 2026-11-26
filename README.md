@@ -1,0 +1,2 @@
+# FileGen
+FileGenはファイル生成AI。FileGenAPIを利用してファイル生成
