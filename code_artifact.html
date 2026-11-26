@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileGen Admin - 会話ログ管理画面</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        code, pre { font-family: 'JetBrains Mono', monospace; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- ログイン画面 -->
+    <div id="loginView" class="flex-1 flex items-center justify-center p-4">
+        <div class="bg-white border border-slate-200 rounded-[28px] shadow-xl max-w-md w-full p-8 space-y-6">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold">FileGen Admin</h1>
+                    <p class="text-xs text-slate-500">全ユーザーの会話履歴モニター</p>
+                </div>
+            </div>
+
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div>
+                    <label for="adminPassInput" class="block text-xs font-semibold text-slate-600 mb-1.5">管理者パスワード</label>
+                    <input type="password" id="adminPassInput" required placeholder="ADMIN_PASSWORD を入力" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-indigo-500">
+                    <p class="text-[11px] text-slate-400 mt-1.5">※Vercelの環境変数 <code>ADMIN_PASSWORD</code>（未設定時は <code>admin1234</code>）</p>
+                </div>
+                <p id="loginError" class="text-xs text-red-500 font-medium hidden"></p>
+                <button type="submit" id="loginBtn" class="w-full py-3 px-5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-full transition-all shadow-xs">
+                    ログインして会話を見る
+                </button>
+            </form>
+
+            <div class="pt-2 border-t border-slate-100 text-center">
+                <a href="/" class="text-xs text-indigo-600 hover:underline font-medium">← FileGen チャット画面へ戻る</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ダッシュボード画面 -->
+    <div id="dashboardView" class="hidden flex-1 flex flex-col h-screen overflow-hidden">
+        <!-- ヘッダー -->
+        <header class="h-16 bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base sm:text-lg leading-tight">FileGen 会話モニター</h1>
+                    <span id="storageBadge" class="text-[11px] text-slate-500">読み込み中...</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="fetchAdminLogs()" class="px-4 py-2 rounded-full bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                    <span>更新</span>
+                </button>
+                <a href="/" class="px-4 py-2 rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold transition-colors">
+                    チャットへ
+                </a>
+                <button onclick="logoutAdmin()" class="p-2 text-slate-400 hover:text-red-500 rounded-full transition-colors" title="ログアウト">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- メインコンテンツ（左：セッション一覧 / 右：会話詳細） -->
+        <div class="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
+            <!-- 左ペイン：会話スレッド一覧 -->
+            <aside class="w-full md:w-96 bg-slate-50 border-b md:border-b-0 md:border-r border-slate-200 flex flex-col max-h-64 md:max-h-none">
+                <div class="p-3 border-b border-slate-200 bg-white">
+                    <div class="relative">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" id="searchInput" oninput="renderSessionList()" placeholder="ユーザーID・会話内容で検索..." class="w-full pl-9 pr-4 py-2 bg-slate-100 rounded-full text-xs focus:outline-none">
+                    </div>
+                </div>
+                <div class="px-4 py-2 text-[11px] font-semibold text-slate-500 flex justify-between">
+                    <span>記録された会話一覧</span>
+                    <span id="totalSessionsCount">0件</span>
+                </div>
+                <div id="adminSessionList" class="flex-1 overflow-y-auto px-3 pb-3 space-y-1.5"></div>
+            </aside>
+
+            <!-- 右ペイン：選択した会話の詳細 -->
+            <main class="flex-1 overflow-y-auto p-4 sm:p-6 bg-white" id="adminDetailPane">
+                <div class="h-full flex flex-col items-center justify-center text-slate-400 text-center space-y-2 py-12">
+                    <i data-lucide="messages-square" class="w-10 h-10 text-slate-300"></i>
+                    <p class="text-sm font-medium">左の一覧から会話を選択すると詳細が表示されます</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        let adminPassword = sessionStorage.getItem('filegen_admin_pass') || '';
+        let allSessions = [];
+        let selectedSessionId = null;
+
+        lucide.createIcons();
+
+        if (adminPassword) {
+            fetchAdminLogs(true);
+        }
+
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const input = document.getElementById('adminPassInput').value.trim();
+            if (!input) return;
+            adminPassword = input;
+            await fetchAdminLogs(false);
+        }
+
+        async function fetchAdminLogs(silent = false) {
+            const errorEl = document.getElementById('loginError');
+            const btn = document.getElementById('loginBtn');
+            if (!silent && btn) btn.textContent = '認証中...';
+
+            try {
+                const res = await fetch('/api/admin-logs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-admin-password': adminPassword
+                    },
+                    body: JSON.stringify({ password: adminPassword })
+                });
+
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error(data.error || '認証に失敗しました');
+                }
+
+                sessionStorage.setItem('filegen_admin_pass', adminPassword);
+                document.getElementById('loginView').classList.add('hidden');
+                document.getElementById('dashboardView').classList.remove('hidden');
+                document.getElementById('dashboardView').classList.add('flex');
+
+                document.getElementById('storageBadge').textContent = `保存先: ${data.storageMode || 'サーバー'}`;
+                allSessions = data.sessions || [];
+                renderSessionList();
+
+                if (selectedSessionId) {
+                    selectAdminSession(selectedSessionId);
+                } else if (allSessions.length > 0) {
+                    selectAdminSession(allSessions[0].sessionId);
+                }
+            } catch (err) {
+                if (errorEl) {
+                    errorEl.textContent = err.message;
+                    errorEl.classList.remove('hidden');
+                }
+                sessionStorage.removeItem('filegen_admin_pass');
+            } finally {
+                if (btn) btn.textContent = 'ログインして会話を見る';
+            }
+        }
+
+        function logoutAdmin() {
+            sessionStorage.removeItem('filegen_admin_pass');
+            adminPassword = '';
+            location.reload();
+        }
+
+        function renderSessionList() {
+            const listEl = document.getElementById('adminSessionList');
+            const query = (document.getElementById('searchInput').value || '').toLowerCase();
+
+            const filtered = allSessions.filter(s => {
+                const inTitle = (s.title || '').toLowerCase().includes(query);
+                const inUser = (s.userId || '').toLowerCase().includes(query);
+                const inMsg = (s.messages || []).some(m => (m.text || '').toLowerCase().includes(query));
+                return inTitle || inUser || inMsg;
+            });
+
+            document.getElementById('totalSessionsCount').textContent = `${filtered.length}件`;
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `<div class="text-center py-8 text-xs text-slate-400">該当する会話履歴がありません</div>`;
+                return;
+            }
+
+            listEl.innerHTML = filtered.map(s => {
+                const isSelected = s.sessionId === selectedSessionId;
+                const timeStr = s.updatedAt ? new Date(s.updatedAt).toLocaleString('ja-JP') : '';
+                const msgCount = (s.messages || []).length;
+                return `
+                    <button onclick="selectAdminSession('${escapeHtml(s.sessionId)}')" class="w-full text-left p-3.5 rounded-2xl border transition-all ${isSelected ? 'bg-indigo-50 border-indigo-200' : 'bg-white border-slate-200/70 hover:bg-slate-100/70'}">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <span class="font-semibold text-xs truncate text-slate-800">${escapeHtml(s.title || '無題の会話')}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-200/70 text-slate-600 flex-shrink-0">${msgCount}件</span>
+                        </div>
+                        <div class="flex items-center justify-between text-[11px] text-slate-500">
+                            <span class="font-mono truncate max-w-[140px]">ID: ${escapeHtml(s.userId || 'anon')}</span>
+                            <span>${timeStr}</span>
+                        </div>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function selectAdminSession(sessionId) {
+            selectedSessionId = sessionId;
+            renderSessionList();
+
+            const session = allSessions.find(s => s.sessionId === sessionId);
+            const pane = document.getElementById('adminDetailPane');
+            if (!session) return;
+
+            const messagesHtml = (session.messages || []).map(m => {
+                const isUser = m.role === 'user';
+                return `
+                    <div class="flex flex-col ${isUser ? 'items-end' : 'items-start'}">
+                        <span class="text-[11px] font-semibold text-slate-400 mb-1 px-1">${isUser ? 'ユーザー' : 'FileGen AI'}</span>
+                        <div class="max-w-3xl px-4 py-3 rounded-2xl text-sm whitespace-pre-wrap leading-relaxed ${isUser ? 'bg-indigo-600 text-white rounded-br-sm' : 'bg-slate-100 text-slate-800 rounded-tl-sm border border-slate-200'}">${escapeHtml(m.text)}</div>
+                    </div>
+                `;
+            }).join('');
+
+            pane.innerHTML = `
+                <div class="max-w-3xl mx-auto space-y-6">
+                    <div class="pb-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900">${escapeHtml(session.title || '無題の会話')}</h2>
+                            <p class="text-xs text-slate-500 font-mono mt-0.5">Session: ${escapeHtml(session.sessionId)} / User: ${escapeHtml(session.userId || 'anonymous')}</p>
+                        </div>
+                        <span class="text-xs text-slate-500">${session.updatedAt ? new Date(session.updatedAt).toLocaleString('ja-JP') : ''}</span>
+                    </div>
+                    <div class="space-y-4">
+                        ${messagesHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>"']/g, m => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[m]));
+        }
+    </script>
+</body>
+</html>
